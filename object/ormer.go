@@ -150,7 +150,7 @@ func refineDataSourceNameForPostgres(dataSourceName string) string {
 
 func createDatabaseForPostgres(driverName string, dataSourceName string, dbName string) error {
 	if driverName == "postgres" {
-		db, err := sql.Open(driverName, refineDataSourceNameForPostgres(dataSourceName))
+		db, err := sql.Open(driverName, dataSourceName)
 		if err != nil {
 			return err
 		}
