@@ -99,7 +99,9 @@ class LoginPage extends React.Component {
           this.setState({enableCaptchaModal: CaptchaRule.Never});
         }
       }
+    }
 
+    if (prevProps.account !== this.props.account && this.props.account !== undefined) {
       if (this.props.account && this.props.account.owner === this.props.application?.organization) {
         const params = new URLSearchParams(this.props.location.search);
         const silentSignin = params.get("silentSignin");
@@ -764,7 +766,11 @@ class LoginPage extends React.Component {
         const rawId = assertion.rawId;
         const sig = assertion.response.signature;
         const userHandle = assertion.response.userHandle;
-        return fetch(`${Setting.ServerUrl}/api/webauthn/signin/finish?responseType=${values["type"]}`, {
+        let finishUrl = `${Setting.ServerUrl}/api/webauthn/signin/finish?responseType=${values["type"]}`;
+        if (values["type"] === "code") {
+          finishUrl = `${Setting.ServerUrl}/api/webauthn/signin/finish?responseType=${values["type"]}&clientId=${oAuthParams.clientId}&scope=${oAuthParams.scope}&redirectUri=${oAuthParams.redirectUri}&nonce=${oAuthParams.nonce}&state=${oAuthParams.state}&codeChallenge=${oAuthParams.codeChallenge}&challengeMethod=${oAuthParams.challengeMethod}`;
+        }
+        return fetch(finishUrl, {
           method: "POST",
           credentials: "include",
           body: JSON.stringify({
